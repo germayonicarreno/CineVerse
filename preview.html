@@ -1,0 +1,179 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CineVerse | Comunidad cinematográfica</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#101014;color:#f5f1eb;font-family:Arial,sans-serif}
+header{background:#19191f;padding:20px 7%;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:15px}
+.logo{font-size:26px;font-weight:bold;color:#e8b95c}
+nav a{color:white;text-decoration:none;margin:0 10px;font-size:14px}
+nav a:hover{color:#e8b95c}
+.hero{padding:65px 8%;background:linear-gradient(90deg,#111118,#24202b);text-align:center}
+.hero h1{font-size:42px;color:#e8b95c}
+.hero p{color:#ccc}
+button{background:#d9a943;color:#171717;border:0;padding:11px 17px;border-radius:7px;cursor:pointer;font-weight:bold}
+button:hover{background:#f3ca75}
+section{padding:35px 8%}
+h2{color:#e8b95c}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:20px}
+.card,.panel{background:#1d1d25;padding:15px;border-radius:12px}
+.card img{width:100%;height:230px;object-fit:cover;border-radius:8px}
+.card h3{margin-bottom:5px}
+small{color:#bbb}
+input,textarea{width:100%;padding:12px;margin:8px 0;background:#292932;border:1px solid #444;color:white;border-radius:7px}
+textarea{resize:vertical}
+.post{background:#202029;padding:16px;margin:12px 0;border-radius:10px}
+footer{text-align:center;padding:25px;background:#19191f;color:#aaa}
+</style>
+</head>
+<body>
+
+<header>
+ <div class="logo">🎬 CINEVERSE</div>
+ <nav>
+  <a href="#inicio">Inicio</a>
+  <a href="#peliculas">Películas</a>
+  <a href="#comunidad">Comunidad</a>
+  <a href="#listas">Mi lista</a>
+  <a href="#trivia">Trivia</a>
+ </nav>
+</header>
+
+<div class="hero" id="inicio">
+ <h1>El cine nos conecta</h1>
+ <p>Descubre historias, comparte opiniones y encuentra personas que aman el cine.</p>
+ <a href="#comunidad"><button>Unirme a la comunidad</button></a>
+</div>
+
+<section id="peliculas">
+ <h2>🍿 Películas destacadas</h2>
+ <input id="busqueda" placeholder="Buscar una película..." oninput="buscar()">
+ <div class="grid" id="catalogo"></div>
+</section>
+
+<section id="comunidad">
+ <h2>💬 Comunidad cinéfila</h2>
+ <div class="panel">
+  <h3>Comparte tu opinión</h3>
+  <input id="usuario" placeholder="Tu nombre">
+  <textarea id="mensaje" placeholder="¿Qué película viste? ¿Qué te pareció?"></textarea>
+  <button onclick="publicar()">Publicar</button>
+ </div>
+ <div id="publicaciones"></div>
+</section>
+
+<section id="listas">
+ <h2>⭐ Mi lista de películas</h2>
+ <p>Guarda las películas que quieres ver.</p>
+ <div id="favoritas" class="grid"></div>
+</section>
+
+<section id="trivia">
+ <h2>🧠 Rincón cinematográfico</h2>
+ <div class="panel">
+  <h3 id="pregunta">¿Qué película tiene un personaje llamado Jack Sparrow?</h3>
+  <div id="respuestas"></div>
+  <p id="resultado"></p>
+  <button onclick="nuevaPregunta()">Siguiente pregunta</button>
+ </div>
+</section>
+
+<footer>
+ <p>🎬 CINEVERSE | Donde cada historia encuentra su público.</p>
+ <small>Una comunidad creada para los amantes del cine.</small>
+</footer>
+
+<script>
+const peliculas=[
+ {nombre:"Interestelar",genero:"Ciencia ficción",imagen:"https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg"},
+ {nombre:"El origen",genero:"Suspenso",imagen:"https://image.tmdb.org/t/p/w500/oYuLEt3zVCKq57qu2F8dT7NIa6f.jpg"},
+ {nombre:"Harry Potter",genero:"Fantasía",imagen:"https://image.tmdb.org/t/p/w500/1stUIsjawROZxjiCMtqqXqgfZWC.jpg"},
+ {nombre:"Coco",genero:"Animación",imagen:"https://image.tmdb.org/t/p/w500/gGEsBPAijhVUFoiNpgZXqRVWJt2.jpg"}
+];
+
+let guardadas=[];
+
+function mostrarPeliculas(lista=peliculas){
+ const catalogo=document.getElementById("catalogo");
+ catalogo.innerHTML="";
+ lista.forEach((p)=>{
+  catalogo.innerHTML+=`
+  <div class="card">
+   <img src="${p.imagen}" alt="${p.nombre}">
+   <h3>${p.nombre}</h3>
+   <small>${p.genero}</small><br><br>
+   <button onclick="guardar('${p.nombre}')">⭐ Guardar</button>
+  </div>`;
+ });
+}
+
+function buscar(){
+ const texto=document.getElementById("busqueda").value.toLowerCase();
+ mostrarPeliculas(peliculas.filter(p=>p.nombre.toLowerCase().includes(texto)));
+}
+
+function guardar(nombre){
+ if(!guardadas.includes(nombre))guardadas.push(nombre);
+ mostrarFavoritas();
+}
+
+function mostrarFavoritas(){
+ document.getElementById("favoritas").innerHTML=
+ guardadas.map(p=>`<div class="card"><h3>🎬 ${p}</h3></div>`).join("");
+}
+
+function publicar(){
+ const nombre=document.getElementById("usuario").value.trim();
+ const mensaje=document.getElementById("mensaje").value.trim();
+ if(!nombre||!mensaje){alert("Completa los dos campos.");return;}
+ const post=document.createElement("div");
+ post.className="post";
+ const titulo=document.createElement("strong");
+ titulo.textContent="👤 "+nombre;
+ const contenido=document.createElement("p");
+ contenido.textContent=mensaje;
+ post.append(titulo,contenido);
+ document.getElementById("publicaciones").prepend(post);
+ document.getElementById("mensaje").value="";
+}
+
+const preguntas=[
+ {p:"¿Qué película tiene un personaje llamado Jack Sparrow?",r:["Titanic","Piratas del Caribe","Avatar"],c:1},
+ {p:"¿Cómo se llama el reino de Elsa?",r:["Arendelle","Narnia","Gotham"],c:0},
+ {p:"¿Qué personaje es conocido como el caballero de la noche?",r:["Superman","Iron Man","Batman"],c:2},
+ {p:"¿En qué película aparece un anillo que debe destruirse?",r:["El señor de los anillos","Harry Potter","Star Wars"],c:0}
+];
+
+let indice=0;
+
+function nuevaPregunta(){
+ indice=(indice+1)%preguntas.length;
+ mostrarPregunta();
+}
+
+function mostrarPregunta(){
+ const q=preguntas[indice];
+ document.getElementById("pregunta").textContent=q.p;
+ document.getElementById("resultado").textContent="";
+ document.getElementById("respuestas").innerHTML="";
+ q.r.forEach((r,i)=>{
+  const b=document.createElement("button");
+  b.textContent=r;
+  b.style.margin="5px";
+  b.onclick=()=>{
+   document.getElementById("resultado").textContent=
+   i===q.c?"¡Respuesta correcta! 🎉":"¡Inténtalo en la siguiente!";
+  };
+  document.getElementById("respuestas").appendChild(b);
+ });
+}
+
+mostrarPeliculas();
+mostrarPregunta();
+</script>
+</body>
+</html>
